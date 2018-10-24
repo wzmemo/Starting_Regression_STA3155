@@ -1,0 +1,70 @@
+gdp <- read.table('GDP.txt', sep = '\t', header = TRUE)
+
+1.
+imod1 <- lm(Personal.Income ~ GDP, data = gdp)
+
+# make hist and qq plot
+par(mfrow = c(1,2))
+hist(imod1$residuals,xlab = 'Residuals', main = 'Histogram of Residuals')
+qqnorm(imod1$residuals); qqline(imod1$residuals)
+
+# Normal Dist violated. Skewed right
+# Try log10 y
+# Justification: y^2 is concave, straighten right
+
+2.
+# Transformed y aganist x
+par(mfrow = c(1,1))
+plot(gdp$GDP,(log10(gdp$Personal.Income)), xlab = 'GDP', ylab = expression(log10(Personal.Income)))
+
+# Linearity not sastified
+# Trying out log10 transformation of x
+par(mfrow = c(1,1))
+plot(log10(gdp$GDP),(log10(gdp$Personal.Income)), xlab = expression(log10(GDP)), ylab = expression(log10(Personal.Income)))
+
+plot(gdp$GDP,(sqrt(gdp$Personal.Income)), xlab = 'GDP', ylab = expression(sqrt(Personal.Income)))
+
+
+# Linear Model on log10 y
+imod3 <- lm(log10(Personal.Income) ~ GDP, data = gdp) # imod3 is log10 transformation of y
+par(mfrow = c(1,2))
+hist(imod3$residuals,xlab = 'Residuals', main = 'Histogram of Residuals')
+qqnorm(imod3$residuals); qqline(imod3$residuals)
+
+# Linearity Assmption not sastified
+
+par(mfrow = c(1,1))
+plot((log10(gdp$Personal.Income)),(log10(gdp$GDP)), xlab = expression(log10(GDP)), ylab = expression(log10(Personal.Income)))
+
+imod4 <- lm(log10(Personal.Income) ~ log10(GDP), data = gdp)
+plot(imod4$fitted.values,imod4$residuals)
+abline(0,0)
+
+par(mfrow = c(1,2))
+qqnorm(imod3$residuals); qqline(imod3$residuals)
+hist(imod3$residuals)
+
+par(mfrow = c(1,1))
+plot((log10(gdp$GDP)),(log10(gdp$Personal.Income)), xlab = expression(log10(GDP)), ylab = expression(log10(Personal.Income)))
+
+plot((-1/(sqrt(gdp$GDP))),(log10(gdp$Personal.Income)), xlab = expression(-1/(sqrt(GDP))), ylab = expression(log10(Personal.Income)))
+
+
+# imod5 for sqrt transformation x, sqrt transformation y
+par(mfrow = c(1,1))
+plot((sqrt(gdp$GDP)),(sqrt(gdp$Personal.Income)), xlab = expression((sqrt(GDP))),
+     ylab = expression(sqrt(Personal.Income)))
+
+imod5 <- lm(sqrt(Personal.Income) ~ sqrt(GDP), data = gdp)
+
+par(mfrow = c(1,2))
+hist(imod5$residuals)
+qqnorm(imod5$residuals); qqline(imod5$residuals)
+
+plot(imod5$fitted.values,imod5$residuals)
+abline(0,0)
+
+range(gdp$GDP)
+
+new <- data.frame(GDP = c(300000))
+predict(imod5, newdata = new, interval = 'prediction', level = 0.95)
